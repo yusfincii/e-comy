@@ -1,20 +1,21 @@
 package com.ecom.user.users.service;
 
-import com.ecom.user.users.api.dto.UsersDTO;
+import com.ecom.user.users.api.dto.UsersRequestDTO;
+import com.ecom.user.users.api.dto.UsersResponseDTO;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UsersService {
 
-    List<UsersDTO> getAllUsers();
+    List<UsersResponseDTO> getAllUsers();
 
-    UsersDTO getUserById(Long id);
+    UsersResponseDTO getUserById(UUID id);
 
-    UsersDTO createUser(UsersDTO usersDTO, UUID createdBy);
+    UsersResponseDTO createUser(UsersRequestDTO usersDTO, UUID createdBy);
 
-    UsersDTO updateUser(Long id, UsersDTO usersDTO, UUID updatedBy);
+    UsersResponseDTO updateUser(UUID id, UsersRequestDTO usersDTO, UUID updatedBy);
 
-    void deleteUser(Long id, UUID deletedBy);
+    void deleteUser(UUID id, UUID deletedBy);
 
 }

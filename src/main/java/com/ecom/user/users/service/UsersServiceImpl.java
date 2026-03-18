@@ -1,6 +1,7 @@
 package com.ecom.user.users.service;
 
-import com.ecom.user.users.api.dto.UsersDTO;
+import com.ecom.user.users.api.dto.UsersRequestDTO;
+import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.exception.UserNotFoundException;
 import com.ecom.user.users.mapper.UsersMapper;
 import com.ecom.user.users.persistence.Users;
@@ -21,37 +22,39 @@ public class UsersServiceImpl implements UsersService {
     private UsersMapper mapper;
 
     @Override
-    public List<UsersDTO> getAllUsers() {
-        return mapper.toDTOList(repository.findAll());
+    public List<UsersResponseDTO> getAllUsers() {
+        return mapper.toResponseDTOList(repository.findAll());
     }
 
     @Override
-    public UsersDTO getUserById(Long id) {
-        return mapper.toDTO(repository.findById(id).orElseThrow(UserNotFoundException::new));
+    public UsersResponseDTO getUserById(UUID id) {
+        return mapper.toResponseDTO(repository.findById(id).orElseThrow(UserNotFoundException::new));
     }
 
     @Override
     @Transactional
-    public UsersDTO createUser(UsersDTO usersDTO, UUID createdBy) {
+    public UsersResponseDTO createUser(UsersRequestDTO usersDTO, UUID createdBy) {
         Users created = mapper.toEntity(usersDTO);
         created.setCreateTime(LocalDateTime.now());
         created.setCreatedBy(createdBy);
-        return mapper.toDTO(repository.save(created));
+        return mapper.toResponseDTO(repository.save(created));
     }
 
     @Override
     @Transactional
-    public UsersDTO updateUser(Long id, UsersDTO usersDTO, UUID updatedBy) {
+    public UsersResponseDTO updateUser(UUID id, UsersRequestDTO usersDTO, UUID updatedBy) {
         Users updated = repository.findById(id).orElseThrow(UserNotFoundException::new);
-        updated = mapper.toEntity(usersDTO);
+        updated.setUserType(mapper.stringToUserType(usersDTO.getType()));
+        updated.setEmail(usersDTO.getEmail());
+        updated.setPassword(usersDTO.getPassword());
         updated.setUpdateTime(LocalDateTime.now());
         updated.setUpdatedBy(updatedBy);
-        return mapper.toDTO(repository.save(updated));
+        return mapper.toResponseDTO(repository.save(updated));
     }
 
     @Override
     @Transactional
-    public void deleteUser(Long id, UUID userId) {
+    public void deleteUser(UUID id, UUID userId) {
         Users user = repository.findById(id).orElseThrow(UserNotFoundException::new);
         user.setIsDeleted(true);
         user.setUpdateTime(LocalDateTime.now());

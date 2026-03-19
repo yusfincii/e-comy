@@ -23,13 +23,13 @@ public class FavouritesServiceImpl implements FavouritesService{
 
     @Override
     public List<FavouritesDTO> findByUserId(UUID userId) {
-        return mapper.toDTOList(repository.findByUserId(userId));
+        return mapper.toDTOList(repository.findById_UserId(userId));
     }
 
     // can use for favourite rate for a product - quantity
     @Override
     public List<FavouritesDTO> findByProductId(UUID productId) {
-        return mapper.toDTOList(repository.findByProductId(productId));
+        return mapper.toDTOList(repository.findById_ProductId(productId));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class FavouritesServiceImpl implements FavouritesService{
     @Override
     @Transactional
     public void deleteFavourite(UUID userId, UUID productId) {
-        Favourites deleted = repository.findByUserIdAndProductId(userId, productId)
+        Favourites deleted = repository.findById_UserIdAndId_ProductId(userId, productId)
                 .orElseThrow(FavouriteNotFoundException::new);
         repository.delete(deleted);
     }

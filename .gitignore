@@ -4,3 +4,7 @@ target/
 .mvn/
 .mvn/wrapper
 .idea/
+
+# Secret config files
+application.properties
+.env

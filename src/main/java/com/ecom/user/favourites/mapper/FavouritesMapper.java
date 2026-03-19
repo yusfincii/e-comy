@@ -2,7 +2,6 @@ package com.ecom.user.favourites.mapper;
 
 import com.ecom.user.favourites.api.dto.FavouritesDTO;
 import com.ecom.user.favourites.persistence.entity.Favourites;
-import com.ecom.user.favourites.persistence.entity.FavouritesId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

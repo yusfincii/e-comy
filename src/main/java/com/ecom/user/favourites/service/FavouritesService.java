@@ -13,7 +13,7 @@ public interface FavouritesService {
 
     List<FavouritesDTO> findByProductId(UUID productId);
 
-    void createFavourite(FavouritesDTO createDTO);
+    void createFavourite(FavouritesDTO createDTO, UUID userId);
 
     void deleteFavourite(UUID userId, UUID productId);
 

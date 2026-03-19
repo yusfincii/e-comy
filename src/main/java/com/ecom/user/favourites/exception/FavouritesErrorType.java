@@ -9,5 +9,5 @@ public enum FavouritesErrorType {
 
     FAVOURITE_NOT_FOUND(1L);
 
-    private Long code;
+    private final Long code;
 }

@@ -14,10 +14,6 @@ public interface FavouritesMapper {
     FavouritesDTO toDTO(Favourites favourites);
 
     @Mapping(target = "id.productId", source = "productId")
-    @Mapping(target = "id.userId", ignore = true)
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "product", ignore = true)
-    @Mapping(target = "createTime", ignore = true)
     Favourites toEntity(FavouritesDTO dto);
 
     List<FavouritesDTO> toDTOList(List<Favourites> favouritesList);

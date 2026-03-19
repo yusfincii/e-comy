@@ -24,7 +24,7 @@ public class Favourites {
     @MapsId("userId")
     private Users user;
 
-    // open then product service impl
+    // open after product service impl
     @ManyToOne
     @MapsId("productId")
     private Products product;

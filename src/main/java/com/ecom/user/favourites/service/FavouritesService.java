@@ -15,6 +15,6 @@ public interface FavouritesService {
 
     void createFavourite(FavouritesDTO createDTO);
 
-    void deleteFavourite(FavouritesDTO deleteDTO);
+    void deleteFavourite(UUID userId, UUID productId);
 
 }

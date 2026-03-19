@@ -20,15 +20,6 @@ public class Favourites {
     @EmbeddedId
     private FavouritesId id;
 
-    @ManyToOne
-    @MapsId("userId")
-    private Users user;
-
-    // open after product service impl
-    @ManyToOne
-    @MapsId("productId")
-    private Products product;
-
     @Column(name = "create_time")
     private LocalDateTime createTime;
 }

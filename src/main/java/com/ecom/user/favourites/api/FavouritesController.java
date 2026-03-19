@@ -20,7 +20,7 @@ public class FavouritesController {
     private FavouritesService service;
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<FavouritesDTO>> getByUserId(@PathVariable UUID userId){
+    public ResponseEntity<List<FavouritesDTO>> getByUserId(@RequestHeader("x-user-id") UUID userId){
         return new ResponseEntity<>(service.findByUserId(userId), HttpStatus.OK);
     }
 
@@ -30,8 +30,9 @@ public class FavouritesController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createFavourite(@RequestBody FavouritesDTO createDTO){
-        service.createFavourite(createDTO);
+    public ResponseEntity<Void> createFavourite(@RequestHeader("x-user-id") UUID userId,
+                                                @RequestBody FavouritesDTO createDTO){
+        service.createFavourite(createDTO, userId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

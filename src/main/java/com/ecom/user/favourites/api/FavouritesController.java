@@ -36,8 +36,9 @@ public class FavouritesController {
     }
 
     @DeleteMapping("/{userId}/{productId}")
-    public ResponseEntity<Void> deleteFavourite(@RequestBody FavouritesDTO deleteDTO) {
-        service.deleteFavourite(deleteDTO);
+    public ResponseEntity<Void> deleteFavourite(@PathVariable UUID userId,
+                                                @PathVariable UUID productId) {
+        service.deleteFavourite(userId, productId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -27,7 +27,7 @@ public class FavouritesServiceImpl implements FavouritesService{
 
     @Override
     @Transactional
-    public void deleteFavourite(FavouritesDTO deleteDTO) {
+    public void deleteFavourite(UUID userId, UUID productId) {
 
     }
 

@@ -2,6 +2,7 @@ package com.ecom.user.users.service;
 
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
+import com.ecom.user.users.enumeration.UserType;
 import com.ecom.user.users.exception.UserNotFoundException;
 import com.ecom.user.users.mapper.UsersMapper;
 import com.ecom.user.users.persistence.Users;
@@ -12,14 +13,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class UsersServiceImpl implements UsersService {
 
-    private UsersRepository repository;
-    private UsersMapper mapper;
+    private final UsersRepository repository;
+    private final UsersMapper mapper;
 
     @Override
     public List<UsersResponseDTO> getAllUsers() {
@@ -44,7 +46,7 @@ public class UsersServiceImpl implements UsersService {
     @Transactional
     public UsersResponseDTO updateUser(UUID id, UsersRequestDTO usersDTO, UUID updatedBy) {
         Users updated = repository.findById(id).orElseThrow(UserNotFoundException::new);
-        updated.setUserType(mapper.stringToUserType(usersDTO.getType()));
+        updated.setUserType(UserType.valueOf(usersDTO.getUserType().toUpperCase(Locale.ROOT)));
         updated.setEmail(usersDTO.getEmail());
         updated.setPassword(usersDTO.getPassword());
         updated.setUpdateTime(LocalDateTime.now());

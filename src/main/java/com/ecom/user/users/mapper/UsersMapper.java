@@ -16,7 +16,7 @@ public interface UsersMapper {
 
     UsersResponseDTO toResponseDTO(Users users);
 
-    @Mapping(source = "type", target = "userType", qualifiedByName = "stringToUserType")
+    @Mapping(source = "userType", target = "userType", qualifiedByName = "stringToUserType")
     Users toEntity(UsersRequestDTO dto);
 
     List<UsersResponseDTO> toResponseDTOList(List<Users> usersList);

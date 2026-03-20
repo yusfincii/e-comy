@@ -9,16 +9,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsersRequestDTO {
 
-    private UUID id;
-    private String type;
+    private String userType;
 
     @NotBlank(message = "Email can not be blank!")
     @Email(message = "Please enter a valid password!")

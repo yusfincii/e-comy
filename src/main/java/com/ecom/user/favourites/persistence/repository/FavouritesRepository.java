@@ -2,7 +2,6 @@ package com.ecom.user.favourites.persistence.repository;
 
 import com.ecom.user.favourites.persistence.entity.Favourites;
 import com.ecom.user.favourites.persistence.entity.FavouritesId;
-import com.ecom.user.users.persistence.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

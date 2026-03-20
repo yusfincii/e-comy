@@ -15,6 +15,6 @@ import java.util.UUID;
 public class UsersResponseDTO {
 
     private UUID id;
-    private UserType type;
+    private UserType userType;
     private String email;
 }

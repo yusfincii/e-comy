@@ -5,7 +5,6 @@ import com.ecom.user.favourites.exception.FavouriteNotFoundException;
 import com.ecom.user.favourites.mapper.FavouritesMapper;
 import com.ecom.user.favourites.persistence.entity.Favourites;
 import com.ecom.user.favourites.persistence.repository.FavouritesRepository;
-import com.ecom.user.users.service.UsersService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

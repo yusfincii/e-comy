@@ -2,9 +2,7 @@ package com.ecom.user.users.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.catalina.User;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

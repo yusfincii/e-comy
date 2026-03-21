@@ -4,20 +4,18 @@ import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.enumeration.UserType;
 import com.ecom.user.users.exception.InvalidUserTypeException;
+import com.ecom.user.users.exception.UserFoundWithEmailException;
 import com.ecom.user.users.exception.UserNotFoundException;
 import com.ecom.user.users.mapper.UsersMapper;
 import com.ecom.user.users.persistence.Users;
 import com.ecom.user.users.persistence.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -38,28 +36,50 @@ public class UsersServiceImpl implements UsersService {
         return mapper.toResponseDTO(repository.findById(id).orElseThrow(UserNotFoundException::new));
     }
 
-    @Override
-    @Transactional
-    public UsersResponseDTO createUser(UsersRequestDTO usersDTO, UUID createdBy) {
+    // Fields checks according to the business logic
+    private void userCreateControls(UsersRequestDTO usersDTO){
         // user type check
         if(!UserType.getNames().contains(usersDTO.getUserType().trim().toUpperCase())){
             throw new InvalidUserTypeException();
         }
-        Users created = mapper.toEntity(usersDTO);
-        created.setPassword(encoder.encode(usersDTO.getPassword()));
+
+        // exist e-mail check
+        if(repository.existsUsersByEmail(usersDTO.getEmail().trim())){
+            throw new UserFoundWithEmailException();
+        }
+    }
+
+    @Override
+    @Transactional
+    public UsersResponseDTO createUser(UsersRequestDTO usersDTO, UUID createdBy) {
+        userCreateControls(usersDTO);
+        Users created = mapper.toEntity(usersDTO, encoder);
         created.setCreateTime(LocalDateTime.now());
         created.setCreatedBy(createdBy);
         return mapper.toResponseDTO(repository.save(created));
+    }
+
+    // Fields checks according to the business logic and existing user
+    private void userUpdateControls(UsersRequestDTO usersDTO, Users entity){
+        // user type check
+        if(!UserType.getNames().contains(usersDTO.getUserType().trim().toUpperCase())){
+            throw new InvalidUserTypeException();
+        }
+
+        // not exist e-mail check
+        if(!entity.getEmail().equals(usersDTO.getEmail().trim())){ // case - mail address update
+            if(repository.existsUsersByEmail(usersDTO.getEmail().trim())){
+                throw new UserFoundWithEmailException();
+            }
+        }
     }
 
     @Override
     @Transactional
     public UsersResponseDTO updateUser(UUID id, UsersRequestDTO usersDTO, UUID updatedBy) {
         Users updated = repository.findById(id).orElseThrow(UserNotFoundException::new);
-        updated.setUserType(UserType.valueOf(usersDTO.getUserType().toUpperCase(Locale.ROOT)));
-        updated.setPassword(encoder.encode(usersDTO.getPassword()));
-        updated.setEmail(usersDTO.getEmail());
-        updated.setPassword(usersDTO.getPassword());
+        userUpdateControls(usersDTO, updated);
+        mapper.updateEntityFromDto(usersDTO, updated, encoder);
         updated.setUpdateTime(LocalDateTime.now());
         updated.setUpdatedBy(updatedBy);
         return mapper.toResponseDTO(repository.save(updated));

@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum UsersErrorType {
 
     USER_NOT_FOUND(1L),
-    INVALID_USER_TYPE(2L);
+    INVALID_USER_TYPE(2L),
+    USER_EMAIL_EXIST(3L);
 
     private final Long code;
 }

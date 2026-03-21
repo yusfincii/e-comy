@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UsersErrorType {
 
-    USER_NOT_FOUND(1L);
+    USER_NOT_FOUND(1L),
+    INVALID_USER_TYPE(2L);
 
     private final Long code;
 }

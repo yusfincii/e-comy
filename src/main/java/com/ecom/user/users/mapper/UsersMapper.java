@@ -7,16 +7,18 @@ import com.ecom.user.users.persistence.Users;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UsersMapper {
 
     UsersResponseDTO toResponseDTO(Users users);
 
     @Mapping(source = "userType", target = "userType", qualifiedByName = "stringToUserType")
+    @Mapping(target = "password", source = "password", ignore = true)
     Users toEntity(UsersRequestDTO dto);
 
     List<UsersResponseDTO> toResponseDTOList(List<Users> usersList);

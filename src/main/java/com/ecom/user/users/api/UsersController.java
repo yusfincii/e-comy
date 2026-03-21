@@ -3,7 +3,6 @@ package com.ecom.user.users.api;
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.service.UsersService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -41,13 +40,13 @@ public class UsersController {
     @PutMapping("/{id}")
     public ResponseEntity<UsersResponseDTO> updateUser(@PathVariable UUID id,
                                                        @Valid @RequestBody UsersRequestDTO usersDTO,
-                                                       @RequestHeader("x-user-id") UUID userId){
+                                                       @RequestHeader("updated-by") UUID userId){
         return new ResponseEntity<>(usersService.updateUser(id, usersDTO, userId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id,
-                                           @RequestHeader("x-user-id") UUID userId){
+                                           @RequestHeader("deleted-by") UUID userId){
         usersService.deleteUser(id, userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

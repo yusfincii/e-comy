@@ -4,10 +4,8 @@ import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.enumeration.UserType;
 import com.ecom.user.users.persistence.Users;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,9 +15,15 @@ public interface UsersMapper {
 
     UsersResponseDTO toResponseDTO(Users users);
 
+    @Mapping(source = "email", target = "email", qualifiedByName = "trimEmail")
     @Mapping(source = "userType", target = "userType", qualifiedByName = "stringToUserType")
-    @Mapping(target = "password", source = "password", ignore = true)
-    Users toEntity(UsersRequestDTO dto);
+    @Mapping(source = "password", target = "password", qualifiedByName = "encodePassword")
+    Users toEntity(UsersRequestDTO dto, @Context PasswordEncoder encoder);
+
+    @Mapping(source = "email", target = "email", qualifiedByName = "trimEmail")
+    @Mapping(source = "userType", target = "userType", qualifiedByName = "stringToUserType")
+    @Mapping(source = "password", target = "password", qualifiedByName = "encodePassword")
+    void updateEntityFromDto(UsersRequestDTO dto, @MappingTarget Users entity, @Context PasswordEncoder encoder);
 
     List<UsersResponseDTO> toResponseDTOList(List<Users> usersList);
 
@@ -29,10 +33,20 @@ public interface UsersMapper {
         if (type == null) {
             return null;
         }
-        
+
         return Arrays.stream(UserType.values())
                 .filter(userType -> userType.name().equalsIgnoreCase(type))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Named("trimEmail")
+    default String trimEmail(String email) {
+        return email == null ? null : email.trim();
+    }
+
+    @Named("encodePassword")
+    default String encodePassword(String password, @Context PasswordEncoder encoder) {
+        return password == null ? null : encoder.encode(password);
     }
 }

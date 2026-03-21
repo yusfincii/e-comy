@@ -3,15 +3,19 @@ package com.ecom.user.users.service;
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.enumeration.UserType;
+import com.ecom.user.users.exception.InvalidUserTypeException;
 import com.ecom.user.users.exception.UserNotFoundException;
 import com.ecom.user.users.mapper.UsersMapper;
 import com.ecom.user.users.persistence.Users;
 import com.ecom.user.users.persistence.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -22,6 +26,7 @@ public class UsersServiceImpl implements UsersService {
 
     private final UsersRepository repository;
     private final UsersMapper mapper;
+    private final PasswordEncoder encoder;
 
     @Override
     public List<UsersResponseDTO> getAllUsers() {
@@ -36,7 +41,12 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional
     public UsersResponseDTO createUser(UsersRequestDTO usersDTO, UUID createdBy) {
+        // user type check
+        if(!UserType.getNames().contains(usersDTO.getUserType().trim().toUpperCase())){
+            throw new InvalidUserTypeException();
+        }
         Users created = mapper.toEntity(usersDTO);
+        created.setPassword(encoder.encode(usersDTO.getPassword()));
         created.setCreateTime(LocalDateTime.now());
         created.setCreatedBy(createdBy);
         return mapper.toResponseDTO(repository.save(created));
@@ -47,6 +57,7 @@ public class UsersServiceImpl implements UsersService {
     public UsersResponseDTO updateUser(UUID id, UsersRequestDTO usersDTO, UUID updatedBy) {
         Users updated = repository.findById(id).orElseThrow(UserNotFoundException::new);
         updated.setUserType(UserType.valueOf(usersDTO.getUserType().toUpperCase(Locale.ROOT)));
+        updated.setPassword(encoder.encode(usersDTO.getPassword()));
         updated.setEmail(usersDTO.getEmail());
         updated.setPassword(usersDTO.getPassword());
         updated.setUpdateTime(LocalDateTime.now());

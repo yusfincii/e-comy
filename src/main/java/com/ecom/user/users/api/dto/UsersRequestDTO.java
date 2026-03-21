@@ -18,14 +18,14 @@ public class UsersRequestDTO {
     private String userType;
 
     @NotBlank(message = "Email can not be blank!")
-    @Email(message = "Please enter a valid password!")
-    @Size(max = 255, message = "Email can not be larger than 255 char!")
+    @Email(message = "Please enter a valid email address!")
+    @Size(max = 255, message = "Email can not be larger than 255 characters!")
     private String email;
 
     @NotBlank(message = "Password can not be blank!")
-    @Size(min = 8, max = 72, message = "Password length must be between 8-72 character!")
+    @Size(min = 8, max = 72, message = "Password length must be between 8-72 characters!")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
-            message = "Password must contain at least one uppercase letter, one lowercase letter and one number")
+            message = "Password must contain at least one uppercase letter, one lowercase letter and one number!")
     private String password;
 }

@@ -3,7 +3,9 @@ package com.ecom.user.users.api;
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.service.UsersService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +33,14 @@ public class UsersController {
     }
 
     @PostMapping
-    public ResponseEntity<UsersResponseDTO> createUser(@RequestBody UsersRequestDTO usersDTO,
-                                                       @RequestHeader("x-user-id") UUID userId){
+    public ResponseEntity<UsersResponseDTO> createUser(@Valid @RequestBody UsersRequestDTO usersDTO,
+                                                       @RequestHeader(name = "created-by") UUID userId) {
         return new ResponseEntity<>(usersService.createUser(usersDTO, userId), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UsersResponseDTO> updateUser(@PathVariable UUID id,
-                                                       @RequestBody UsersRequestDTO usersDTO,
+                                                       @Valid @RequestBody UsersRequestDTO usersDTO,
                                                        @RequestHeader("x-user-id") UUID userId){
         return new ResponseEntity<>(usersService.updateUser(id, usersDTO, userId), HttpStatus.OK);
     }

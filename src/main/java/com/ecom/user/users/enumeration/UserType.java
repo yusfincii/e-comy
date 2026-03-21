@@ -2,6 +2,11 @@ package com.ecom.user.users.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.catalina.User;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -13,4 +18,10 @@ public enum UserType {
 
     private final Long id;
     private final Long code;
+
+    public static List<String> getNames(){
+        return Arrays.stream(UserType.values())
+                .map(UserType::name)
+                .toList();
+    }
 }

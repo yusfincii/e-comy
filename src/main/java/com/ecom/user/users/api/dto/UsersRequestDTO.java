@@ -1,5 +1,6 @@
 package com.ecom.user.users.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -21,6 +22,12 @@ public class UsersRequestDTO {
     @Email(message = "Please enter a valid email address!")
     @Size(max = 255, message = "Email can not be larger than 255 characters!")
     private String email;
+
+    // ignore whitespace characters on leading and following
+    @JsonSetter
+    public void setEmail(String email) {
+        this.email = email != null ? email.trim() : null;
+    }
 
     @NotBlank(message = "Password can not be blank!")
     @Size(min = 8, max = 72, message = "Password length must be between 8-72 characters!")

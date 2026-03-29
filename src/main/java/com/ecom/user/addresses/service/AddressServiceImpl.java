@@ -5,6 +5,8 @@ import com.ecom.user.addresses.api.dto.AddressResponseDTO;
 import com.ecom.user.addresses.exception.AddressNotFoundException;
 import com.ecom.user.addresses.mapper.AddressMapper;
 import com.ecom.user.addresses.persistence.repository.AddressRepository;
+import com.ecom.user.users.exception.UserNotFoundException;
+import com.ecom.user.users.service.UsersService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository repository;
     private final AddressMapper mapper;
+    private final UsersService usersService;
 
     @Override
     public AddressResponseDTO getAddressById(UUID addressId) {
@@ -27,6 +30,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressResponseDTO> getAddressByUserId(UUID userId) {
+        if(usersService.isExistUserById(userId)){
+            throw new UserNotFoundException();
+        }
         return mapper.toResponseDTOList(repository.findByUserId(userId));
     }
 
@@ -45,9 +51,9 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public void deleteAddress(UUID addressId, UUID deletedBy) {
-        if(repository.existsById(addressId)){
-            repository.deleteById(addressId);
+        int deletedCount = repository.deleteIfExistsById(addressId);
+        if (deletedCount == 0) {
+            throw new AddressNotFoundException();
         }
-        throw new AddressNotFoundException();
     }
 }

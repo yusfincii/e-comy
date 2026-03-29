@@ -2,6 +2,7 @@ package com.ecom.user.users.api;
 
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
+import com.ecom.user.users.api.dto.UsersUpdateRequestDTO;
 import com.ecom.user.users.service.UsersService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UsersController {
 
-    private UsersService usersService;
+    private final UsersService usersService;
 
     @GetMapping
     public ResponseEntity<List<UsersResponseDTO>> getAllUsers(){
@@ -39,7 +40,7 @@ public class UsersController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UsersResponseDTO> updateUser(@PathVariable UUID id,
-                                                       @Valid @RequestBody UsersRequestDTO usersDTO,
+                                                       @Valid @RequestBody UsersUpdateRequestDTO usersDTO,
                                                        @RequestHeader("updated-by") UUID userId){
         return new ResponseEntity<>(usersService.updateUser(id, usersDTO, userId), HttpStatus.OK);
     }

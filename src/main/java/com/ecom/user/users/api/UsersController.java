@@ -4,6 +4,7 @@ import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.api.dto.UsersUpdateRequestDTO;
 import com.ecom.user.users.service.UsersService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -50,5 +51,11 @@ public class UsersController {
                                            @RequestHeader("deleted-by") UUID userId){
         usersService.deleteUser(id, userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(summary = "is exist by user id")
+    @GetMapping("/exist/{userId}")
+    public ResponseEntity<Boolean> isExistUserById(@PathVariable UUID userId){
+        return new ResponseEntity<>(usersService.isExistUserById(userId), HttpStatus.OK);
     }
 }

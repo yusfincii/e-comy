@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "address", schema = "user_schema")
+@Table(name = "addresses", schema = "user_schema")
 @Getter
 @Setter
 @AllArgsConstructor

@@ -26,6 +26,8 @@ public class UsersServiceImpl implements UsersService {
     private final UsersRepository repository;
     private final UsersMapper mapper;
     private final PasswordEncoder encoder;
+    private final UsersRepository usersRepository;
+
     @Override
     public List<UsersResponseDTO> getAllUsers() {
         return mapper.toResponseDTOList(repository.findAll());
@@ -44,7 +46,7 @@ public class UsersServiceImpl implements UsersService {
         }
 
         // exist e-mail check
-        if(repository.existsUsersByEmail(usersDTO.getEmail().trim())){
+        if(repository.existsByEmail(usersDTO.getEmail().trim())){
             throw new UserFoundWithEmailException();
         }
     }
@@ -70,7 +72,7 @@ public class UsersServiceImpl implements UsersService {
         // Check e-mail uniqueness only when e-mail is provided and changed.
         if(usersDTO.getEmail() != null &&
                 !entity.getEmail().equals(usersDTO.getEmail().trim())){
-            if(repository.existsUsersByEmail(usersDTO.getEmail().trim())){
+            if(repository.existsByEmail(usersDTO.getEmail().trim())){
                 throw new UserFoundWithEmailException();
             }
         }
@@ -95,5 +97,13 @@ public class UsersServiceImpl implements UsersService {
         user.setUpdateTime(LocalDateTime.now());
         user.setUpdatedBy(userId);
         repository.save(user);
+    }
+
+    @Override
+    public Boolean isExistUserById(UUID id) {
+        if(id == null){
+            return false;
+        }
+        return usersRepository.existsById(id);
     }
 }

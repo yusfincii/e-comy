@@ -19,4 +19,6 @@ public interface UsersService {
 
     void deleteUser(UUID id, UUID deletedBy);
 
+    Boolean isExistUserById(UUID id);
+
 }

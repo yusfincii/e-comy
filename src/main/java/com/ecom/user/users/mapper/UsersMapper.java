@@ -2,6 +2,7 @@ package com.ecom.user.users.mapper;
 
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
+import com.ecom.user.users.api.dto.UsersUpdateRequestDTO;
 import com.ecom.user.users.enumeration.UserType;
 import com.ecom.user.users.persistence.Users;
 import org.mapstruct.*;
@@ -20,10 +21,11 @@ public interface UsersMapper {
     @Mapping(source = "password", target = "password", qualifiedByName = "encodePassword")
     Users toEntity(UsersRequestDTO dto, @Context PasswordEncoder encoder);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "email", target = "email", qualifiedByName = "trimEmail")
     @Mapping(source = "userType", target = "userType", qualifiedByName = "stringToUserType")
     @Mapping(source = "password", target = "password", qualifiedByName = "encodePassword")
-    void updateEntityFromDto(UsersRequestDTO dto, @MappingTarget Users entity, @Context PasswordEncoder encoder);
+    void updateEntityFromDto(UsersUpdateRequestDTO dto, @MappingTarget Users entity, @Context PasswordEncoder encoder);
 
     List<UsersResponseDTO> toResponseDTOList(List<Users> usersList);
 

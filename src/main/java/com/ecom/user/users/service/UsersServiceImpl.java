@@ -2,6 +2,7 @@ package com.ecom.user.users.service;
 
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
+import com.ecom.user.users.api.dto.UsersUpdateRequestDTO;
 import com.ecom.user.users.enumeration.UserType;
 import com.ecom.user.users.exception.InvalidUserTypeException;
 import com.ecom.user.users.exception.UserFoundWithEmailException;
@@ -25,7 +26,6 @@ public class UsersServiceImpl implements UsersService {
     private final UsersRepository repository;
     private final UsersMapper mapper;
     private final PasswordEncoder encoder;
-
     @Override
     public List<UsersResponseDTO> getAllUsers() {
         return mapper.toResponseDTOList(repository.findAll());
@@ -60,14 +60,16 @@ public class UsersServiceImpl implements UsersService {
     }
 
     // Fields checks according to the business logic and existing user
-    private void userUpdateControls(UsersRequestDTO usersDTO, Users entity){
-        // user type check
-        if(!UserType.getNames().contains(usersDTO.getUserType().trim().toUpperCase())){
+    private void userUpdateControls(UsersUpdateRequestDTO usersDTO, Users entity){
+        // Validate only provided user type for partial update requests.
+        if(usersDTO.getUserType() != null &&
+                !UserType.getNames().contains(usersDTO.getUserType().trim().toUpperCase())){
             throw new InvalidUserTypeException();
         }
 
-        // not exist e-mail check
-        if(!entity.getEmail().equals(usersDTO.getEmail().trim())){ // case - mail address update
+        // Check e-mail uniqueness only when e-mail is provided and changed.
+        if(usersDTO.getEmail() != null &&
+                !entity.getEmail().equals(usersDTO.getEmail().trim())){
             if(repository.existsUsersByEmail(usersDTO.getEmail().trim())){
                 throw new UserFoundWithEmailException();
             }
@@ -76,7 +78,7 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     @Transactional
-    public UsersResponseDTO updateUser(UUID id, UsersRequestDTO usersDTO, UUID updatedBy) {
+    public UsersResponseDTO updateUser(UUID id, UsersUpdateRequestDTO usersDTO, UUID updatedBy) {
         Users updated = repository.findById(id).orElseThrow(UserNotFoundException::new);
         userUpdateControls(usersDTO, updated);
         mapper.updateEntityFromDto(usersDTO, updated, encoder);

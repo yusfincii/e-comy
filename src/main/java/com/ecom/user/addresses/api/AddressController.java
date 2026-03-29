@@ -3,6 +3,7 @@ package com.ecom.user.addresses.api;
 import com.ecom.user.addresses.service.AddressService;
 import com.ecom.user.addresses.api.dto.AddressRequestDTO;
 import com.ecom.user.addresses.api.dto.AddressResponseDTO;
+import com.ecom.user.addresses.api.dto.AddressUpdateRequestDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,21 +32,21 @@ public class AddressController {
 
     @PostMapping
     public ResponseEntity<AddressResponseDTO> createAddress(@RequestBody @Validated AddressRequestDTO createDTO,
-                                                            UUID createdBy){
+                                                            @RequestHeader(name = "created-by") UUID createdBy){
         return new ResponseEntity<>(service.createAddress(createDTO, createdBy), HttpStatus.CREATED);
     }
 
     @PutMapping("/{addressId}")
     public ResponseEntity<AddressResponseDTO> updateAddress(@PathVariable UUID addressId,
-                                                            @RequestBody @Validated AddressRequestDTO updateDTO,
-                                                            UUID updatedBy){
+                                                            @RequestBody @Validated AddressUpdateRequestDTO updateDTO,
+                                                            @RequestHeader(name = "updated-by") UUID updatedBy){
         return new ResponseEntity<>(service.updateAddress(addressId, updateDTO, updatedBy), HttpStatus.OK);
 
     }
 
     @DeleteMapping("/{addressId}")
     public ResponseEntity<Void> deleteAddress(@PathVariable UUID addressId,
-                                                            UUID deletedBy){
+                                              @RequestHeader(name = "deleted-by") UUID deletedBy){
         service.deleteAddress(addressId, deletedBy);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

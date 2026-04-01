@@ -1,5 +1,9 @@
 package com.ecom.user.users.service;
 
+import com.ecom.user.sellerprofiles.exception.TaxNumberCanNotBeNullException;
+import com.ecom.user.sellerprofiles.mapper.SellerProfilesMapper;
+import com.ecom.user.sellerprofiles.persistence.entity.SellerProfiles;
+import com.ecom.user.sellerprofiles.persistence.repository.SellerProfilesRepository;
 import com.ecom.user.users.api.dto.UsersRequestDTO;
 import com.ecom.user.users.api.dto.UsersResponseDTO;
 import com.ecom.user.users.api.dto.UsersUpdateRequestDTO;
@@ -10,10 +14,10 @@ import com.ecom.user.users.exception.UserNotFoundException;
 import com.ecom.user.users.mapper.UsersMapper;
 import com.ecom.user.users.persistence.Users;
 import com.ecom.user.users.persistence.repository.UsersRepository;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +31,8 @@ public class UsersServiceImpl implements UsersService {
     private final UsersMapper mapper;
     private final PasswordEncoder encoder;
     private final UsersRepository usersRepository;
+    private final SellerProfilesMapper sellerProfilesMapper;
+    private final SellerProfilesRepository sellerProfilesRepository;
 
     @Override
     public List<UsersResponseDTO> getAllUsers() {
@@ -49,16 +55,38 @@ public class UsersServiceImpl implements UsersService {
         if(repository.existsByEmail(usersDTO.getEmail().trim())){
             throw new UserFoundWithEmailException();
         }
+
+        // --- seller profile checks ---
+        if(usersDTO.getUserType().equals(UserType.SELLER.toString())){
+            if (usersDTO.getTaxNumber() == null){
+                throw new TaxNumberCanNotBeNullException();
+            }
+        }
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UsersResponseDTO createUser(UsersRequestDTO usersDTO, UUID createdBy) {
         userCreateControls(usersDTO);
         Users created = mapper.toEntity(usersDTO, encoder);
         created.setCreateTime(LocalDateTime.now());
         created.setCreatedBy(createdBy);
-        return mapper.toResponseDTO(repository.save(created));
+        Users saved = repository.save(created);
+        // response dto initialization
+        UsersResponseDTO responseDTO = mapper.toResponseDTO(saved);
+
+        if(usersDTO.getUserType().equalsIgnoreCase(UserType.SELLER.toString())){
+            SellerProfiles sellerProfiles = sellerProfilesMapper.toEntity(usersDTO);
+            sellerProfiles.setUserId(saved.getId());
+            sellerProfiles.setCreatedBy(createdBy);
+            sellerProfiles.setCreateTime(LocalDateTime.now());
+            sellerProfilesRepository.save(sellerProfiles);
+
+            // enrich response dto with seller profiles fields
+            sellerProfilesMapper.enrichUserResponseFromSellerProfile(sellerProfiles, responseDTO);
+        }
+
+        return responseDTO;
     }
 
     // Fields checks according to the business logic and existing user

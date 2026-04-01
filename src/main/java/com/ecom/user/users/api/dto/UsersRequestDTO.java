@@ -31,8 +31,26 @@ public class UsersRequestDTO {
 
     @NotBlank(message = "Password can not be blank!")
     @Size(min = 8, max = 72, message = "Password length must be between 8-72 characters!")
-    @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
             message = "Password must contain at least one uppercase letter, one lowercase letter and one number!")
     private String password;
+
+    // name and surname fields should be not blank
+    // because they used on each user type
+    @NotBlank(message = "Name can not be blank!")
+    @Size(min = 3, max = 64)
+    @Pattern(regexp = "^[\\p{L}]+(?:[ '-][\\p{L}]+)*$",
+            message = "Name can only contain letters, spaces, hyphens, or apostrophes")
+    private String name;
+
+    @NotBlank(message = "Surname can not be blank!")
+    @Size(min = 2, max = 64)
+    @Pattern(regexp = "^[\\p{L}]+(?:[ '-][\\p{L}]+)*$",
+            message = "Surname can only contain letters, spaces, hyphens, or apostrophes")
+    private String surname;
+
+    @Size(min = 7, max = 16)
+    @Pattern(regexp = "^\\d{7,16}$",
+            message = "Tax number must contain 7 to 16 digits")
+    private String taxNumber;
 }

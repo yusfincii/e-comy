@@ -14,6 +14,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UsersMapper {
 
+    @Mapping(source = "id", target = "userId")
     UsersResponseDTO toResponseDTO(Users users);
 
     @Mapping(source = "email", target = "email", qualifiedByName = "trimEmail")

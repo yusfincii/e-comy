@@ -1,14 +1,13 @@
 package com.ecom.user.users.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -53,4 +52,27 @@ public class UsersRequestDTO {
     @Pattern(regexp = "^\\d{7,16}$",
             message = "Tax number must contain 7 to 16 digits")
     private String taxNumber;
+
+    @Digits(integer = 3, fraction = 0,
+            message = "Weight must be a whole number!")
+    private Integer weight; // optional
+
+    @Digits(integer = 3, fraction = 0,
+            message = "Height must be a whole number!")
+    private Integer height; // optional
+
+    @NotNull(message = "Birth date field can not be null!")
+    @PastOrPresent(message = "Birth date cannot be later than today!")
+    private LocalDate birthDate;
+
+    @NotBlank(message = "Phone number must be filled!")
+    @Pattern(
+            regexp = "^\\+[1-9]\\d{6,14}$",
+            message = "Phone number must be in E.164 format (e.g. +905321234567)"
+    )
+    @Size(min = 7, max = 20, message = "Phone number must be between 6 and 20 characters")
+    private String phoneNumber;
+
+    @NotBlank(message = "Gender field can not be blank!")
+    private String gender;
 }

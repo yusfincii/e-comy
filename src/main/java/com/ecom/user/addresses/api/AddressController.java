@@ -1,9 +1,9 @@
 package com.ecom.user.addresses.api;
 
-import com.ecom.user.addresses.service.AddressService;
 import com.ecom.user.addresses.api.dto.AddressRequestDTO;
 import com.ecom.user.addresses.api.dto.AddressResponseDTO;
 import com.ecom.user.addresses.api.dto.AddressUpdateRequestDTO;
+import com.ecom.user.addresses.service.AddressService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

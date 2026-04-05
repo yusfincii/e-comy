@@ -1,5 +1,11 @@
 package com.ecom.user.users.service;
 
+import com.ecom.user.customerprofiles.enumeration.Gender;
+import com.ecom.user.customerprofiles.exception.InvalidGenderException;
+import com.ecom.user.customerprofiles.exception.RequiredFieldsMustBeFillForCustomerProfileException;
+import com.ecom.user.customerprofiles.mapper.CustomerProfilesMapper;
+import com.ecom.user.customerprofiles.persistence.entity.CustomerProfiles;
+import com.ecom.user.customerprofiles.persistence.repository.CustomerProfilesRepository;
 import com.ecom.user.sellerprofiles.exception.TaxNumberCanNotBeNullException;
 import com.ecom.user.sellerprofiles.mapper.SellerProfilesMapper;
 import com.ecom.user.sellerprofiles.persistence.entity.SellerProfiles;
@@ -33,6 +39,8 @@ public class UsersServiceImpl implements UsersService {
     private final UsersRepository usersRepository;
     private final SellerProfilesMapper sellerProfilesMapper;
     private final SellerProfilesRepository sellerProfilesRepository;
+    private final CustomerProfilesMapper customerProfilesMapper;
+    private final CustomerProfilesRepository customerProfilesRepository;
 
     @Override
     public List<UsersResponseDTO> getAllUsers() {
@@ -62,6 +70,18 @@ public class UsersServiceImpl implements UsersService {
                 throw new TaxNumberCanNotBeNullException();
             }
         }
+
+        // --- customer profile checks ---
+        if(usersDTO.getUserType().equals(UserType.CUSTOMER.toString())){
+            if (usersDTO.getBirthDate() == null || usersDTO.getPhoneNumber() == null ||
+                    usersDTO.getGender() == null ){
+                throw new RequiredFieldsMustBeFillForCustomerProfileException();
+            }
+            if(!Gender.getNames().contains(usersDTO.getGender().trim().toUpperCase())){
+                throw new InvalidGenderException();
+            }
+        }
+
     }
 
     @Override
@@ -84,6 +104,14 @@ public class UsersServiceImpl implements UsersService {
 
             // enrich response dto with seller profiles fields
             sellerProfilesMapper.enrichUserResponseFromSellerProfile(sellerProfiles, responseDTO);
+        } else if (usersDTO.getUserType().equalsIgnoreCase(UserType.CUSTOMER.toString())) {
+            CustomerProfiles customerProfiles = customerProfilesMapper.toEntity(usersDTO);
+            customerProfiles.setUserId(saved.getId());
+            customerProfiles.setCreatedBy(createdBy);
+            customerProfiles.setCreateTime(LocalDateTime.now());
+            customerProfilesRepository.save(customerProfiles);
+            // enrich response dto with customer profiles fields
+            customerProfilesMapper.enrichUserResponseFromCustomerProfile(customerProfiles, responseDTO);
         }
 
         return responseDTO;
@@ -91,13 +119,13 @@ public class UsersServiceImpl implements UsersService {
 
     // Fields checks according to the business logic and existing user
     private void userUpdateControls(UsersUpdateRequestDTO usersDTO, Users entity){
-        // Validate only provided user type for partial update requests.
+        // Validate only provided user type for partial update requests
         if(usersDTO.getUserType() != null &&
                 !UserType.getNames().contains(usersDTO.getUserType().trim().toUpperCase())){
             throw new InvalidUserTypeException();
         }
 
-        // Check e-mail uniqueness only when e-mail is provided and changed.
+        // Check e-mail uniqueness only when e-mail is provided and changed
         if(usersDTO.getEmail() != null &&
                 !entity.getEmail().equals(usersDTO.getEmail().trim())){
             if(repository.existsByEmail(usersDTO.getEmail().trim())){
@@ -107,7 +135,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UsersResponseDTO updateUser(UUID id, UsersUpdateRequestDTO usersDTO, UUID updatedBy) {
         Users updated = repository.findById(id).orElseThrow(UserNotFoundException::new);
         userUpdateControls(usersDTO, updated);
@@ -118,7 +146,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteUser(UUID id, UUID userId) {
         Users user = repository.findById(id).orElseThrow(UserNotFoundException::new);
         user.setIsDeleted(true);
